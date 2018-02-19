@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.7.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/Woodforfood/devops-training.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/task5</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.BatchFile>
+      <command>cd C:\Users\Administrator\.jenkins\workspace\MusicStore\samples\MusicStore&#xd;
+dotnet restore&#xd;
+dotnet build --configuration Release&#xd;
+dotnet publish C:\Users\Administrator\.jenkins\workspace\MusicStore\samples\MusicStore --output published-app --configuration Release -f=netcoreapp2.0</command>
+    </hudson.tasks.BatchFile>
+    <hudson.tasks.BatchFile>
+      <command>octo pack --id MusicStore --version 5.1.%BUILD_NUMBER% --basePath C:\Users\Administrator\.jenkins\workspace\MusicStore\samples\MusicStore\published-app&#xd;
+octo push --package MusicStore.5.1.%BUILD_NUMBER%.nupkg --server http://localhost/ --apiKey API-OF5IQC6UVFJ43UFTMMVHQCEEIQY</command>
+    </hudson.tasks.BatchFile>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
