@@ -1,0 +1,31 @@
+apply plugin: 'war'
+repositories {
+    mavenCentral()
+}
+dependencies {
+    compile group: 'log4j', name: 'log4j', version: '1.2.17'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+}
+task changeVersion << {
+    def versionFile = new File("$rootDir/gradle.properties")
+        String versionNumber 
+        versionFile.withReader { reader ->
+           versionNumber = reader.readLine()
+        }
+        def (major, minor, patch) = versionNumber.tokenize('.')
+        def temp = patch.toInteger() + 1
+        versionNumber = "${major}.${minor}.${temp}"
+        versionFile.withWriter { writer ->
+           writer.println versionNumber
+        } 
+}
+task addVersion << {
+    def dst = new File("$buildDir/resources/main/greeting.txt")
+    new File("$rootDir/gradle.properties").eachLine { line ->
+        if (line.contains('version')) {
+            dst << "\r\n" << line 
+        }
+    }
+}
+addVersion.shouldRunAfter processResources
+war.dependsOn addVersion
