@@ -22,7 +22,7 @@ node ('master') {
     stage ('upload') {
         dir ('build/libs') {
             withCredentials([usernameColonPassword(credentialsId: 'NEXUS_ADMIN', variable: 'password')]) {
-              sh "curl -XPUT -u $password -T gradleSample-'$version'.war http://192.168.0.10:8081/nexus/content/repositories/snapshots/task6/'$version'/gradleSample-'$version'.war"
+              sh "curl -XPUT -u $password -T gradleSample.war http://192.168.0.10:8081/nexus/content/repositories/snapshots/task6/'$version'/gradleSample.war"
            }
         }
    }
@@ -30,14 +30,20 @@ node ('master') {
 
 node ('Tomcat1') {
     stage ('download&deploy') {
-        sh "curl --insecure http://192.168.0.10:8081/nexus/service/local/repositories/snapshots/content/task6/'$version'/gradleSample-'$version'.war > /var/lib/tomcat/webapps/gradleSample-'$version'.war"
+        sh "curl --insecure http://192.168.0.10:8081/nexus/service/local/repositories/snapshots/content/task6/'$version'/gradleSample.war > /var/lib/tomcat/webapps/gradleSample.war"
     }
     stage ('stop lb') {
         sh 'curl "http://192.168.0.10/jkmanager?cmd=update&from=list&w=lb&sw=tomcat1&vwa=1"'
     }
     sleep 8
-    stage('check url') {
-        sh "curl http://192.168.0.11:8080/gradleSample-'$version'/"
+    stage('check version tomcat1') {
+        sh "cd /var/lib/tomcat/webapps/gradleSample/WEB-INF/classes/"
+        def file = readFile("/var/lib/tomcat/webapps/gradleSample/WEB-INF/classes/greeting.txt")
+        if (file.contains("version=${version}")) {
+            echo "Version is correct"
+        } else {
+            error ("Version is not correct")
+        }   
     }
     sleep 8
     stage ('start lb') {
@@ -46,18 +52,24 @@ node ('Tomcat1') {
 }
 node ('Tomcat2') {
     stage ('download&deploy') {
-        sh "curl --insecure http://192.168.0.10:8081/nexus/service/local/repositories/snapshots/content/task6/'$version'/gradleSample-'$version'.war > /var/lib/tomcat/webapps/gradleSample-'$version'.war"
+        sh "curl --insecure http://192.168.0.10:8081/nexus/service/local/repositories/snapshots/content/task6/'$version'/gradleSample.war > /var/lib/tomcat/webapps/gradleSample.war"
     }
     stage ('stop lb') {
-        sh 'curl "http://192.168.0.10/jkmanager?cmd=update&from=list&w=lb&sw=tomcat1&vwa=1"'
+        sh 'curl "http://192.168.0.10/jkmanager?cmd=update&from=list&w=lb&sw=tomcat2&vwa=1"'
     }
     sleep 8
-    stage('check url') {
-        sh "curl http://192.168.0.12:8080/gradleSample-'$version'/"
+    stage('check version tomcat2') {
+        sh "cd /var/lib/tomcat/webapps/gradleSample/WEB-INF/classes/"
+        def file = readFile("/var/lib/tomcat/webapps/gradleSample/WEB-INF/classes/greeting.txt")
+        if (file.contains("version=${version}")) {
+            echo "Version is correct"
+        } else {
+            error ("Version is not correct")
+        }   
     }
     sleep 8
     stage ('start lb') {
-        sh 'curl "http://192.168.0.10/jkmanager?cmd=update&from=list&w=lb&sw=tomcat1&vwa=0"'
+        sh 'curl "http://192.168.0.10/jkmanager?cmd=update&from=list&w=lb&sw=tomcat2&vwa=0"'
     }
 }
 node ('master') {
@@ -73,8 +85,10 @@ node ('master') {
           sh 'git pull https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git master'
           sh 'git merge --no-ff task6'
           sh 'git push https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git master'
-          sh 'git tag -a v1.0.4 -m "version 1.0.4"'
-          sh 'git push https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git v1.0.4'
+          def props = readProperties  file:"${env.WORKSPACE}/gradle.properties"
+          version = props['version']
+          sh "git tag -a v'${version}'"
+          sh "git push https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git v'${version}'"
         }
     }
 }
