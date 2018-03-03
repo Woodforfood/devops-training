@@ -48,7 +48,6 @@ node ('master') {
             error ("Version is not correct")
         }
     }
-}
     stage ('push&merge') {
         withCredentials([usernamePassword(credentialsId: 'Git', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
           sh 'git checkout task7'    
