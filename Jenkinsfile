@@ -1,7 +1,7 @@
 def version
 node ('master') {
     stage ('clone') {
-        git branch: 'task6', url: 'https://github.com/Woodforfood/devops-training.git'
+        git branch: 'task7', url: 'https://github.com/Woodforfood/devops-training.git'
     }
     stage ('increment Version') {
         sh './gradlew task changeVersion'
@@ -22,71 +22,45 @@ node ('master') {
     stage ('upload') {
         dir ('build/libs') {
             withCredentials([usernameColonPassword(credentialsId: 'NEXUS_ADMIN', variable: 'password')]) {
-              sh "curl -XPUT -u $password -T gradleSample.war http://192.168.0.10:8081/nexus/content/repositories/snapshots/task6/'$version'/gradleSample.war"
+              sh "curl -XPUT -u $password -T gradleSample.war http://192.168.0.10:8081/nexus/content/repositories/snapshots/task7/'$version'/gradleSample.war"
            }
         }
-   }
-}
-
-node ('Tomcat1') {
-    stage ('download&deploy') {
-        sh "curl --insecure http://192.168.0.10:8081/nexus/service/local/repositories/snapshots/content/task6/'$version'/gradleSample.war > /var/lib/tomcat/webapps/gradleSample.war"
     }
-    stage ('stop lb') {
-        sh 'curl "http://192.168.0.10/jkmanager?cmd=update&from=list&w=lb&sw=tomcat1&vwa=1"'
+    stage ('docker') {
+        sh "docker build -t greeting:'$version' ."
+        sh "docker tag greeting:'$version' 192.168.0.10:5000/task7:'$version'"
+        sh "docker push 192.168.0.10:5000/task7:'$version'"
+    }           
+    stage ('deploy') {
+        try {
+            sh "docker service create --name greeting -p 8083:8080 --replicas 2 192.168.0.10:5000/task7:'$version'"
+        }
+        catch(all) {
+            sh "docker service update greeting"
+        }
     }
-    sleep 8
-    stage('check version tomcat1') {
-        sh "cd /var/lib/tomcat/webapps/gradleSample/WEB-INF/classes/"
-        def file = readFile("/var/lib/tomcat/webapps/gradleSample/WEB-INF/classes/greeting.txt")
-        if (file.contains("version=${version}")) {
+    sleep 7
+    stage ('check') {
+        def result = sh returnStdout: true, script: 'curl "http://192.168.0.10:8083/gradleSample/"'
+        if (result.contains("version=${version}")) {
             echo "Version is correct"
         } else {
             error ("Version is not correct")
-        }   
-    }
-    sleep 8
-    stage ('start lb') {
-        sh 'curl "http://192.168.0.10/jkmanager?cmd=update&from=list&w=lb&sw=tomcat1&vwa=0"'
+        }
     }
 }
-node ('Tomcat2') {
-    stage ('download&deploy') {
-        sh "curl --insecure http://192.168.0.10:8081/nexus/service/local/repositories/snapshots/content/task6/'$version'/gradleSample.war > /var/lib/tomcat/webapps/gradleSample.war"
-    }
-    stage ('stop lb') {
-        sh 'curl "http://192.168.0.10/jkmanager?cmd=update&from=list&w=lb&sw=tomcat2&vwa=1"'
-    }
-    sleep 8
-    stage('check version tomcat2') {
-        sh "cd /var/lib/tomcat/webapps/gradleSample/WEB-INF/classes/"
-        def file = readFile("/var/lib/tomcat/webapps/gradleSample/WEB-INF/classes/greeting.txt")
-        if (file.contains("version=${version}")) {
-            echo "Version is correct"
-        } else {
-            error ("Version is not correct")
-        }   
-    }
-    sleep 8
-    stage ('start lb') {
-        sh 'curl "http://192.168.0.10/jkmanager?cmd=update&from=list&w=lb&sw=tomcat2&vwa=0"'
-    }
-}
-node ('master') {
     stage ('push&merge') {
         withCredentials([usernamePassword(credentialsId: 'Git', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
-          sh 'git checkout task6'    
+          sh 'git checkout task7'    
           sh 'git status'    
           sh 'git add gradle.properties'
           sh 'git commit -m "updated"'
-          sh 'git pull https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git task6'
-          sh 'git push https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git task6'
+          sh 'git pull https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git task7'
+          sh 'git push https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git task7'
           sh 'git checkout master'
           sh 'git pull https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git master'
-          sh 'git merge --no-ff task6'
+          sh 'git merge --no-ff task7'
           sh 'git push https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git master'
-          def props = readProperties  file:"${env.WORKSPACE}/gradle.properties"
-          version = props['version']
           sh "git tag -a v'${version}'"
           sh "git push https://${GIT_USER}:${GIT_PASS}@github.com/woodforfood/devops-training.git v'${version}'"
         }
