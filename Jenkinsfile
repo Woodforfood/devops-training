@@ -39,7 +39,7 @@ node ('master') {
             sh "docker service update greeting"
         }
     }
-    sleep 7
+    sleep 8
     stage ('check') {
         def result = sh returnStdout: true, script: 'curl "http://192.168.0.10:8083/gradleSample/"'
         if (result.contains("version=${version}")) {
@@ -48,7 +48,6 @@ node ('master') {
             error ("Version is not correct")
         }
     }
-}
     stage ('push&merge') {
         withCredentials([usernamePassword(credentialsId: 'Git', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
           sh 'git checkout task7'    
