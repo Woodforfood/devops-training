@@ -39,7 +39,7 @@ node ('master') {
             sh "docker service update greeting"
         }
     }
-    sleep 8
+    sleep 7
     stage ('check') {
         def result = sh returnStdout: true, script: 'curl "http://192.168.0.10:8083/gradleSample/"'
         if (result.contains("version=${version}")) {
