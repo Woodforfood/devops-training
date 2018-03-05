@@ -27,7 +27,7 @@ node ('master') {
         }
     }
     stage ('docker') {
-        sh "docker build -t greeting:'$version' ."
+        sh "docker build --build-arg version='$version' -t greeting:'$version' ."
         sh "docker tag greeting:'$version' 192.168.0.10:5000/task7:'$version'"
         sh "docker push 192.168.0.10:5000/task7:'$version'"
     }           
@@ -36,7 +36,7 @@ node ('master') {
             sh "docker service create --name greeting -p 8083:8080 --replicas 2 192.168.0.10:5000/task7:'$version'"
         }
         catch(all) {
-            sh "docker service update greeting"
+            sh "docker service update --image 192.168.0.10:5000/task7:'$version' greeting"
         }
     }
     sleep 8
