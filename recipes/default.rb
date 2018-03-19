@@ -13,4 +13,8 @@ file '/etc/docker/daemon.json' do
     content "{ \"insecure-registries\" : [\"#{node['test']['address']}\"] }"
     action :create
 end
+service 'docker' do
+    supports :status => true, :restart => true, :start => true
+    action [ :start ]
+end
 # Copyright:: 2018, The Authors, All Rights Reserved.
