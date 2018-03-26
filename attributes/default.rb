@@ -1,1 +1,1 @@
-node.default['dockapp']['version'] = '1.0.7'
+node.default['dockapp']['version'] = '1.0.8'

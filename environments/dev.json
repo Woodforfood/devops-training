@@ -2,7 +2,7 @@
   "name": "dev",
   "description": "The development environment.",
   "cookbook_versions": {
-    "dockapp": "= 1.0.7"
+    "dockapp": "= 1.0.8"
   },
   "json_class": "Chef::Environment",
   "chef_type": "environment",
