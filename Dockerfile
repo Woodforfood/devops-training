@@ -1,2 +1,2 @@
-FROM tomcat:7.0.85-jre8
+FROM 8.0-alpine
 ARG version
