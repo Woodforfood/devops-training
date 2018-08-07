@@ -38,7 +38,7 @@
   tasks:
     - name: Tag the Old instances as zombie
       ec2_tag:
-        resource: "{{ item }}"
+        resource: "{{ item.id }}"
         region: "eu-central-1"
         state: present
         tags:
