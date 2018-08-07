@@ -47,7 +47,6 @@
 
 - name: Terminate EC2 instances
   hosts: localhost
-  delegate_to: localhost
   gather_facts: no
   
   vars:
@@ -63,6 +62,7 @@
         filters:
           "tag:InstanceSt": zombie
       register: ec2_facts
+      delegate_to: localhost
       
     - name: Terminate EC2 server
       ec2:
