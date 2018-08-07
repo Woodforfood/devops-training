@@ -44,16 +44,15 @@
         tags:
           InstanceSt: zombie
       with_items: "{{ ec2.instances }}"
-- name: Terminate instances
-  hosts: tag_InstanceSt_zombie
-  gather_facts: no
-  tasks:
-    - name: Get the facts about the zombie instances
-      ec2_facts:
-    - name: remove instance by instance id
-      ec2:
-        state: absent
-        region: "eu-central-1"
-        instance_ids: "{{ ec2.instance_id }}"
-        wait: true
-      delegate_to: localhost
+- name: EC2 Facts
+  ec2_instance_facts:
+    region: us-east-1
+    filters:
+      "tag:InstanceSt": "zombie"
+  register: ec2
+
+- name: Kill EC2 Instance
+  ec2:
+    instance_ids: "{{ ec2.instance_ids }}"
+    state: "{{ state }}"
+    region: "eu-central-1"
