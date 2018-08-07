@@ -46,7 +46,7 @@
       with_items: "{{ ec2.instances }}"
 
 - name: Terminate tagged instances
-  hosts: tag_InstanceSt_zombie
+  hosts: all
   tasks:
     - ec2_facts:
     - ec2:
