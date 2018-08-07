@@ -47,7 +47,7 @@
 
 - name: Terminate EC2 instances
   hosts: localhost
-  connection: local
+  delegate_to: localhost
   gather_facts: no
   
   vars:
