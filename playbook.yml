@@ -42,10 +42,11 @@
         region: "eu-central-1"
         state: present
         tags:
-          Instance_Status: "zombie"
+          InstanceSt: "zombie"
       with_items: "{{ ec2.instances }}"
 - name: Terminate instances
-  hosts: tag_Instance_Status_zombie
+  hosts: tag_InstanceSt_zombie
+  connection: local
   gather_facts: no
   tasks:
     - name: Get the facts about the zombie instances
