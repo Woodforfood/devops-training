@@ -7,7 +7,7 @@
   vars:
     key_name: test_key
     instance_type: t2.micro
-    security_group: ssh-http
+    security_group: sg-2eec7943
     image: ami-7c4f7097
     region: eu-central-1
   tasks:
