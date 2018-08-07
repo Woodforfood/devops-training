@@ -67,7 +67,7 @@
     - name: Terminate EC2 server
       ec2:
         region: eu-central-1
-        instance_ids: "{{ item }}"
+        instance_ids: "{{ item.instance_id }}"
         state: absent
       with_items: "{{ ec2.instances }}"
       
