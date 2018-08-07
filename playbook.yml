@@ -47,7 +47,6 @@
 
 - name: EC2 Facts
   ec2_instance_facts:
-    region: eu-central-1
     filters:
       "tag:InstanceSt": zombie
 
