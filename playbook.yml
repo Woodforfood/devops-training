@@ -60,6 +60,8 @@
     - name: Find EC2 Facts
       ec2_instance_facts:
         region: "{{ aws_region }}"
+        filters:
+          "tag:InstanceSt": zombie
       register: ec2_facts
       
     - name: Terminate EC2 server
