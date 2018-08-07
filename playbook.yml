@@ -7,14 +7,12 @@
   vars:
     key_name: test_key
     instance_type: t2.micro
-    security_group: sg-2eec7943
     image: ami-7c4f7097
     region: eu-central-1
   tasks:
     - name: Launch instance
       ec2:
          key_name: "{{ key_name }}"
-         group: "{{ security_group }}"
          instance_type: "{{ instance_type }}"
          image: "{{ image }}"
          wait: true
