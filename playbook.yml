@@ -41,8 +41,8 @@
         resource: "{{ item.id }}"
         region: "eu-central-1"
         state: present
-        tags:
-          InstanceSt: "zombie"
+        instance_tags:
+          InstanceSt: zombie
       with_items: "{{ ec2.instances }}"
 - name: Terminate instances
   hosts: tag_InstanceSt_zombie
