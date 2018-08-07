@@ -49,8 +49,7 @@
   ec2_instance_facts:
     region: eu-central-1
     filters:
-      "tag:InstanceSt": "zombie"
-    with_items: "{{ ec2.instances }}"
+      "tag:InstanceSt": zombie
 
 - name: Kill EC2 Instance
   ec2:
