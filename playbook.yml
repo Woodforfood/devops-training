@@ -49,7 +49,6 @@
     region: us-east-1
     filters:
       "tag:InstanceSt": "zombie"
-  register: ec2
 
 - name: Kill EC2 Instance
   ec2:
