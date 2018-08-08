@@ -5,15 +5,7 @@
   vars:
     region: "eu-central-1"
 
-  tasks:
-  - name: "Remove tagged EC2 instances from security group"
-    ec2:
-      state: "running"
-      region: "{{ region }}"
-      instance_ids: "{{ ec2_id }}"
-      group_id: ""
-    delegate_to: "localhost"
-      
+  tasks:  
   - name: "Terminate tagged EC2 instances"
     ec2:
       state: "absent"
