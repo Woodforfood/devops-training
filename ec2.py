@@ -7,8 +7,8 @@ Generates inventory that Ansible can understand by making API request to
 AWS EC2 using the Boto library.
 NOTE: This script assumes Ansible is being executed where the environment
 variables needed for Boto have already been set:
-    export AWS_ACCESS_KEY_ID='AKIAIWLYDV45FP4ALFUA'
-    export AWS_SECRET_ACCESS_KEY='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'
+    export AWS_ACCESS_KEY_ID='AK123'
+    export AWS_SECRET_ACCESS_KEY='abc123'
 Optional region environment variable if region is 'eu-central-1'
 This script also assumes that there is an ec2.ini file alongside it.  To specify a
 different path to ec2.ini, define the EC2_INI_PATH environment variable:
