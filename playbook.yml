@@ -38,8 +38,8 @@
   sudo: yes
   yum: name=docker state=latest
   command: service docker start
-  command: docker pull 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.6
-  command: docker run -d -p 8083:8080 --name app 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.6
+- command: docker pull 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.6
+- command: docker run -d -p 8083:8080 --name app 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.6
   with_items: "{{ ec2.instances }}"
 
 - name: Tagging
