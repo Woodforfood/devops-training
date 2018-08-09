@@ -33,8 +33,7 @@
       
 - name: Configure instance(s)
   hosts: launched
-  become: True
-  gather_facts: True
+  gather_facts: False
   sudo: yes
   yum: name=docker state=latest
   command: service docker start
