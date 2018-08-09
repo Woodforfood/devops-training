@@ -34,7 +34,6 @@
 - name: Configure instance(s)
   hosts: launched
   gather_facts: False
-  sudo: yes
   yum: name=docker state=latest
   command: service docker start
 - command: docker pull 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.6
