@@ -110,8 +110,15 @@ Resources:
                 sudo chmod a+rwx /var/run/docker.sock
                 aws ecr get-login --region eu-central-1 --no-include-email > login.sh
                 bash login.sh
-                docker pull 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.5
-                docker run -d -p 8080:8080 --name app 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.5
+                echo "version=" > 1.txt
+                aws ecr describe-images --region eu-central-1 --repository-name repo --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' > tags.txt
+                paste -d ' ' 1.txt tags.txt > new.txt
+                sed -r 's/\s+//g' new.txt
+                set -a
+                . ./new.txt
+                set +a
+                docker pull 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:$version
+                docker run -d -p 8080:8080 --name app 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:$version
           services:
             sysvinit:
               docker:
