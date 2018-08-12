@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      AvailabilityZones: ['eu-central-1a', 'eu-central-1b', 'eu-central-1c']
+      HealthCheck:
+        HealthyThreshold: '10'
+        Interval: '30'
+        Target: TCP:8080
+        Timeout: '5'
+        UnhealthyThreshold: '2'
+      ConnectionDrainingPolicy:
+        Enabled: 'true'
+        Timeout: '300'
+      ConnectionSettings:
+        IdleTimeout: '60'
+      CrossZone: 'true'
+      Listeners:
+        - LoadBalancerPort: '80'
+          InstancePort: '8080'
+          Protocol: HTTP
+          InstanceProtocol: HTTP
+
+  S3BucketsProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+      - !Ref S3BucketsRole
+  S3BucketsPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: S3BucketsPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:List*
+          Resource: "*"
+      Roles:
+        - !Ref S3BucketsRole
+  S3BucketsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+
+  SecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Public Security Group"
+      SecurityGroupIngress:
+          IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          SourceSecurityGroupName: !GetAtt LoadBalancer.SourceSecurityGroup.GroupName
+          
+  AppScaling:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones: ['eu-central-1a', 'eu-central-1b', 'eu-central-1c']
+      MinSize: 1
+      MaxSize: 2
+      DesiredCapacity: 1
+      LoadBalancerNames:
+        - !Ref LoadBalancer
+      LaunchConfigurationName: !Ref AppConfig
+
+  AppConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      IamInstanceProfile:
+        Ref: S3BucketsProfile
+      KeyName: aws-ec2
+      ImageId: ami-7c4f7097
+      InstanceType: t2.micro
+      SecurityGroups: [ !Ref SecGroup ]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash -xe
+            /opt/aws/bin/cfn-init -v \
+              --stack ${AWS::StackName} \
+              --resource AppConfig \
+              --region ${AWS::Region}
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          commands:
+            upd_docker:
+              command: !Sub |
+                #!/bin/bash
+                yum install docker -y
+                service docker start
+                usermod -aG docker $USER
+                chmod a+rwx /var/run/docker.sock
+                echo "version=" > /home/ec2-user/1.txt
+                aws ecr describe-images --region eu-central-1 --repository-name repo --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' > /home/ec2-user/tags.txt
+                aws ecr get-login --region eu-central-1 --no-include-email > login.sh
+                bash login.sh
+                cd /home/ec2-user/
+                paste -d ' ' 1.txt tags.txt > new.txt
+                cd /home/ec2-user/
+                awk '{print $1$2,$3,$4,$5,$6,$7}' new.txt > new1.txt
+                set -a
+                source new1.txt
+                set +a
+                docker pull 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.5
+                docker run -d -p 8080:8080 --name app 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.5
+          services:
+            sysvinit:
+              docker:
+                enabled: 'true'
+                ensureRunning: 'true'
