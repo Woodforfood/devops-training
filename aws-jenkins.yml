@@ -85,7 +85,7 @@ Resources:
     Properties:
       IamInstanceProfile:
         Ref: S3BucketsProfile
-      KeyName: aws-ec2
+      KeyName: test_key
       ImageId: ami-7c4f7097
       InstanceType: t2.micro
       SecurityGroups: [ !Ref SecGroup ]
