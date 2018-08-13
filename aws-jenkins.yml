@@ -114,13 +114,10 @@ Resources:
                 bash login.sh
                 cd /home/ec2-user/
                 paste -d ' ' 1.txt tags.txt > new.txt
-                cd /home/ec2-user/
                 awk '{print $1$2,$3,$4,$5,$6,$7}' new.txt > new1.txt
-                set -a
-                source new1.txt
-                set +a
-                docker pull 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.5
-                docker run -d -p 8080:8080 --name app 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:1.0.5
+                export $(cat /home/ec2-user/new1.txt | xargs)
+                docker pull 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:$version
+                docker run -d -p 8080:8080 --name app 036060439216.dkr.ecr.eu-central-1.amazonaws.com/repo:$version
           services:
             sysvinit:
               docker:
