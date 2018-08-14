@@ -6,7 +6,7 @@ Resources:
       AvailabilityZones: ['eu-central-1a', 'eu-central-1b', 'eu-central-1c']
       HealthCheck:
         HealthyThreshold: '10'
-        Interval: '30'
+        Interval: '15'
         Target: TCP:8080
         Timeout: '5'
         UnhealthyThreshold: '2'
