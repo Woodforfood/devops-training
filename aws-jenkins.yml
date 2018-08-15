@@ -56,7 +56,7 @@ Resources:
           - sts:AssumeRole
       Path: "/"
 
-   SGBase:
+  SGBase:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Base Security Group
