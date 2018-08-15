@@ -56,6 +56,16 @@ Resources:
           - sts:AssumeRole
       Path: "/"
 
+   SGBase:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Base Security Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: 22
+          ToPort: 22
+
   SecGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -88,7 +98,7 @@ Resources:
       KeyName: test_key
       ImageId: ami-7c4f7097
       InstanceType: t2.micro
-      SecurityGroups: [ !Ref SecGroup ]
+      SecurityGroups: [ !Ref SecGroup, !Ref SGBase ]
       UserData:
         Fn::Base64:
           !Sub |
