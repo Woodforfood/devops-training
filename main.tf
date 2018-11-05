@@ -21,7 +21,7 @@ resource "aws_elb" "web" {
 resource "aws_instance" "runner" {
   count = 2
   
-  ami = "ami-9a91b371"
+  ami = "ami-0233214e13e500f77"
   instance_type = "t2.micro"
   key_name = "developer-key"
   vpc_security_group_ids = ["sg-2eec7943"]
