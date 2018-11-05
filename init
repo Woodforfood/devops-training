@@ -30,5 +30,3 @@ while getopts "i" opt; do
 done
  
 shift $((OPTIND-1))
- 
-Init
