@@ -29,7 +29,7 @@ resource "aws_instance" "runner" {
     Name = "runner-os"
   }
 }
- provisioner "remote-exec" {
+provisioner "remote-exec" {
   connection {
     type     = "ssh"
     user     = "ec2-user"
