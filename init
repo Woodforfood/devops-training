@@ -17,7 +17,7 @@ init() {
    -backend=s3 \
    -backend-config="bucket=${BUCKET}" \
    -backend-config="key=${PROJECT}/terraform.tfstate" \
-   -backend-config="region=us-west-1"
+   -backend-config="region=eu-central-1"
  
 }
  
@@ -30,3 +30,5 @@ while getopts "i" opt; do
 done
  
 shift $((OPTIND-1))
+
+init
