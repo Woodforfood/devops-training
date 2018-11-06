@@ -28,7 +28,7 @@ resource "aws_instance" "runner" {
   tags {
     Name = "runner-os"
   }
-  
+}
 data "terraform_remote_state" "network" {
   backend = "s3"
   config {
