@@ -28,4 +28,12 @@ resource "aws_instance" "runner" {
   tags {
     Name = "runner-os"
   }
+  
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config {
+    bucket = "bucket-0f63787397203f5cd"
+    key    = ".terraform/terraform.tfstate"
+    region = "eu-central-1"
+  }  
 }
