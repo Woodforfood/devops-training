@@ -28,7 +28,6 @@ resource "aws_instance" "runner" {
   tags {
     Name = "runner-os"
   }
-}
   provisioner "remote-exec" {
     connection {
       type     = "ssh"
@@ -42,6 +41,7 @@ resource "aws_instance" "runner" {
         "sudo docker run -d -p 80:80 -v /tmp:/usr/share/nginx/html --name nginx_${count.index} nginx"
       ]
   }
+}
 data "terraform_remote_state" "network" {
   backend = "s3"
   config {
