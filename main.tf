@@ -33,6 +33,7 @@ provisioner "remote-exec" {
   connection {
     type     = "ssh"
     user     = "ec2-user"
+    key    = ".terraform/terraform.tfstate"
     }
  
     inline = [
