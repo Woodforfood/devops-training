@@ -32,7 +32,7 @@ resource "aws_instance" "runner" {
     connection {
       type     = "ssh"
       user     = "ec2-user"
-      private_key = "${file("vagrant/developer-key.pem")}"
+      private_key = "${file("/vagrant/developer-key.pem")}"
       }
  
       inline = [
