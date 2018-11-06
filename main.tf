@@ -29,6 +29,19 @@ resource "aws_instance" "runner" {
     Name = "runner-os"
   }
 }
+ provisioner "remote-exec" {
+  connection {
+    type     = "ssh"
+    user     = "ec2-user"
+    }
+ 
+    inline = [
+      "sudo yum install -y docker",
+      "sudo service docker start",
+      "sudo docker pull nginx",
+      "sudo docker run -d -p 80:80 -v /tmp:/usr/share/nginx/html --name nginx_${count.index} nginx"
+    ]
+  }
 data "terraform_remote_state" "network" {
   backend = "s3"
   config {
